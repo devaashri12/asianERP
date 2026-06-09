@@ -1,230 +1,502 @@
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ElevateERP — Elevator Management System</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:var(--font-sans);background:var(--color-background-tertiary);color:var(--color-text-primary);min-height:100vh}
-.erp-shell{display:grid;grid-template-columns:220px 1fr;min-height:100vh;background:var(--color-background-tertiary)}
-.sidebar{background:var(--color-background-primary);border-right:0.5px solid var(--color-border-tertiary);display:flex;flex-direction:column;padding:0}
-.brand{padding:18px 16px 14px;border-bottom:0.5px solid var(--color-border-tertiary)}
-.brand-name{font-size:15px;font-weight:500;color:var(--color-text-primary)}
-.brand-sub{font-size:11px;color:var(--color-text-secondary);margin-top:2px}
-.nav-group{padding:10px 0}
-.nav-label{font-size:10px;font-weight:500;color:var(--color-text-tertiary);letter-spacing:.06em;text-transform:uppercase;padding:6px 16px 4px}
-.nav-item{display:flex;align-items:center;gap:9px;padding:7px 16px;font-size:13px;color:var(--color-text-secondary);cursor:pointer;border-left:2px solid transparent;transition:all .15s}
-.nav-item:hover{background:var(--color-background-secondary);color:var(--color-text-primary)}
-.nav-item.active{background:var(--color-background-info);color:var(--color-text-info);border-left-color:#185FA5}
-.nav-item i{font-size:16px;width:18px;flex-shrink:0}
-.main{overflow-y:auto;padding:24px}
-.view{display:none}
-.view.active{display:block}
-.page-header{margin-bottom:20px}
-.page-title{font-size:20px;font-weight:500;color:var(--color-text-primary)}
-.page-sub{font-size:13px;color:var(--color-text-secondary);margin-top:3px}
-.metrics-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px}
-.metric{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:14px}
-.metric-label{font-size:11px;color:var(--color-text-secondary);margin-bottom:6px}
-.metric-value{font-size:22px;font-weight:500;color:var(--color-text-primary)}
-.metric-delta{font-size:11px;margin-top:4px}
-.metric-delta.up{color:var(--color-text-success)}
-.metric-delta.down{color:var(--color-text-danger)}
-.metric-delta.warn{color:var(--color-text-warning)}
-.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:16px 18px;margin-bottom:16px}
-.card-title{font-size:14px;font-weight:500;margin-bottom:14px;color:var(--color-text-primary)}
-.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
-.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px}
-table{width:100%;border-collapse:collapse;font-size:12px}
-th{text-align:left;padding:6px 10px;font-size:11px;font-weight:500;color:var(--color-text-secondary);border-bottom:0.5px solid var(--color-border-tertiary)}
-td{padding:8px 10px;border-bottom:0.5px solid var(--color-border-tertiary);color:var(--color-text-primary)}
-tr:last-child td{border-bottom:none}
-tr:hover td{background:var(--color-background-secondary)}
-.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:100px;font-size:11px;font-weight:500}
-.badge-success{background:var(--color-background-success);color:var(--color-text-success)}
-.badge-warning{background:var(--color-background-warning);color:var(--color-text-warning)}
-.badge-danger{background:var(--color-background-danger);color:var(--color-text-danger)}
-.badge-info{background:var(--color-background-info);color:var(--color-text-info)}
-.badge-gray{background:var(--color-background-secondary);color:var(--color-text-secondary)}
-.progress-bar{height:6px;background:var(--color-border-tertiary);border-radius:3px;overflow:hidden;margin-top:4px}
-.progress-fill{height:100%;border-radius:3px;background:#185FA5}
-.proj-stage{display:flex;align-items:center;gap:0;margin-bottom:12px}
-.stage-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;flex-shrink:0;z-index:1}
-.stage-dot.done{background:#185FA5;color:#fff}
-.stage-dot.active{background:#F59E0B;color:#fff}
-.stage-dot.pending{background:var(--color-border-tertiary);color:var(--color-text-secondary)}
-.stage-line{flex:1;height:2px;background:var(--color-border-tertiary)}
-.stage-line.done{background:#185FA5}
-.stage-info{font-size:11px;color:var(--color-text-secondary);text-align:center;margin-top:4px}
-.pipeline{display:flex;gap:12px;overflow-x:auto;padding-bottom:4px}
-.pipe-col{min-width:160px;flex-shrink:0}
-.pipe-col-title{font-size:11px;font-weight:500;color:var(--color-text-secondary);padding:4px 8px;border-radius:var(--border-radius-md);background:var(--color-background-secondary);margin-bottom:8px;text-align:center}
-.pipe-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:10px;margin-bottom:8px;font-size:12px}
-.pipe-card-title{font-weight:500;color:var(--color-text-primary);margin-bottom:4px}
-.pipe-card-sub{color:var(--color-text-secondary);font-size:11px}
-.pipe-card-val{font-size:12px;font-weight:500;color:var(--color-text-info);margin-top:6px}
-.inv-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:8px}
-.inv-card{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:12px}
-.inv-name{font-size:12px;font-weight:500;margin-bottom:4px}
-.inv-stock{font-size:20px;font-weight:500;margin-bottom:2px}
-.inv-min{font-size:11px;color:var(--color-text-secondary)}
-.amc-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
-.amc-row:last-child{border-bottom:none}
-.amc-name{font-size:13px;font-weight:500}
-.amc-detail{font-size:11px;color:var(--color-text-secondary);margin-top:2px}
-.att-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:8px}
-.att-day{background:var(--color-background-secondary);border-radius:4px;padding:6px 0;text-align:center;font-size:11px}
-.att-day.present{background:var(--color-background-success)}
-.att-day.absent{background:var(--color-background-danger)}
-.att-day.late{background:var(--color-background-warning)}
-.att-day.off{background:var(--color-background-secondary);opacity:.5}
-.att-label{font-size:10px;color:var(--color-text-secondary);margin-bottom:2px}
-.att-count{font-size:14px;font-weight:500}
-.map-placeholder{background:var(--color-background-secondary);border-radius:var(--border-radius-md);height:160px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;color:var(--color-text-secondary);font-size:13px}
-.fin-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
-.fin-row:last-child{border-bottom:none}
-.fin-label{font-size:13px;color:var(--color-text-secondary)}
-.fin-val{font-size:13px;font-weight:500}
-.btn{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:var(--border-radius-md);font-size:12px;cursor:pointer;border:0.5px solid var(--color-border-secondary);background:var(--color-background-secondary);color:var(--color-text-primary);font-family:var(--font-sans)}
-.btn-primary{background:var(--color-background-info);color:var(--color-text-info);border-color:var(--color-border-info)}
-.action-bar{display:flex;gap:8px;margin-bottom:16px;align-items:center;justify-content:space-between;flex-wrap:wrap}
-.role-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;padding:3px 8px;border-radius:100px;background:var(--color-background-secondary);color:var(--color-text-secondary)}
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:       #F4F6FA;
+    --surface:  #FFFFFF;
+    --border:   #E2E8F0;
+    --border2:  #CBD5E1;
+    --primary:  #1E40AF;
+    --primary-light: #EFF6FF;
+    --primary-text: #1D4ED8;
+    --text:     #0F172A;
+    --text-2:   #475569;
+    --text-3:   #94A3B8;
+    --success-bg: #F0FDF4; --success-text: #166534; --success-border: #BBF7D0;
+    --warn-bg:  #FFFBEB;   --warn-text:   #92400E;  --warn-border:   #FDE68A;
+    --danger-bg:#FEF2F2;   --danger-text: #991B1B;  --danger-border: #FECACA;
+    --info-bg:  #EFF6FF;   --info-text:   #1E40AF;  --info-border:   #BFDBFE;
+    --gray-bg:  #F8FAFC;   --gray-text:   #475569;  --gray-border:   #E2E8F0;
+    --sidebar-w: 230px;
+    --radius-sm: 6px;
+    --radius:    10px;
+    --radius-lg: 14px;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 13px;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  /* ── Layout ── */
+  .shell { display: flex; min-height: 100vh; }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    width: var(--sidebar-w);
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+
+  .brand {
+    padding: 20px 18px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .brand-icon {
+    width: 36px; height: 36px;
+    background: var(--primary);
+    border-radius: var(--radius-sm);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 18px; flex-shrink: 0;
+  }
+  .brand-name { font-size: 15px; font-weight: 600; color: var(--text); }
+  .brand-sub  { font-size: 11px; color: var(--text-3); margin-top: 1px; }
+
+  .user-row {
+    padding: 12px 18px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .avatar {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--info-bg); color: var(--info-text);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 600; flex-shrink: 0;
+  }
+  .user-name { font-size: 12px; font-weight: 500; }
+  .user-role { font-size: 10px; color: var(--text-3); margin-top: 1px; }
+
+  .nav-section { padding: 10px 0 4px; }
+  .nav-group-label {
+    font-size: 10px; font-weight: 600; color: var(--text-3);
+    text-transform: uppercase; letter-spacing: .06em;
+    padding: 6px 18px 4px;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 18px;
+    font-size: 13px; color: var(--text-2);
+    cursor: pointer;
+    border-left: 3px solid transparent;
+    transition: background .12s, color .12s;
+    user-select: none;
+  }
+  .nav-item i { font-size: 16px; width: 18px; flex-shrink: 0; }
+  .nav-item:hover { background: var(--bg); color: var(--text); }
+  .nav-item.active {
+    background: var(--primary-light);
+    color: var(--primary-text);
+    border-left-color: var(--primary);
+    font-weight: 500;
+  }
+
+  /* ── Main ── */
+  .main { flex: 1; overflow-y: auto; padding: 28px 32px; min-width: 0; }
+
+  .view { display: none; }
+  .view.active { display: block; }
+
+  .page-header { margin-bottom: 24px; }
+  .page-title { font-size: 20px; font-weight: 600; color: var(--text); }
+  .page-sub   { font-size: 13px; color: var(--text-2); margin-top: 4px; }
+
+  /* ── Metric cards ── */
+  .metrics-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 14px;
+    margin-bottom: 22px;
+  }
+  .metric {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+  }
+  .metric-label { font-size: 11px; color: var(--text-3); font-weight: 500; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+  .metric-value { font-size: 24px; font-weight: 600; color: var(--text); line-height: 1; }
+  .metric-delta { font-size: 11px; margin-top: 6px; }
+  .delta-up   { color: var(--success-text); }
+  .delta-down { color: var(--danger-text); }
+  .delta-warn { color: var(--warn-text); }
+
+  /* ── Cards ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 20px 22px;
+    margin-bottom: 20px;
+  }
+  .card-title {
+    font-size: 14px; font-weight: 600; color: var(--text);
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* ── Two / Three column grids ── */
+  .col-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+  .col-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+
+  /* ── Table ── */
+  .tbl-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 400px; }
+  thead th {
+    text-align: left;
+    padding: 8px 12px;
+    font-size: 11px; font-weight: 600; color: var(--text-3);
+    text-transform: uppercase; letter-spacing: .04em;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+  }
+  tbody td { padding: 10px 12px; border-bottom: 1px solid var(--border); color: var(--text); vertical-align: middle; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: var(--bg); }
+
+  /* ── Badges ── */
+  .badge {
+    display: inline-flex; align-items: center;
+    padding: 3px 9px; border-radius: 100px;
+    font-size: 11px; font-weight: 500; white-space: nowrap;
+  }
+  .badge-success { background: var(--success-bg); color: var(--success-text); border: 1px solid var(--success-border); }
+  .badge-warn    { background: var(--warn-bg);    color: var(--warn-text);    border: 1px solid var(--warn-border); }
+  .badge-danger  { background: var(--danger-bg);  color: var(--danger-text);  border: 1px solid var(--danger-border); }
+  .badge-info    { background: var(--info-bg);    color: var(--info-text);    border: 1px solid var(--info-border); }
+  .badge-gray    { background: var(--gray-bg);    color: var(--gray-text);    border: 1px solid var(--gray-border); }
+
+  /* ── Buttons ── */
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 16px; border-radius: var(--radius-sm);
+    font-size: 13px; font-weight: 500; cursor: pointer;
+    border: 1px solid var(--border2); background: var(--surface); color: var(--text);
+    font-family: 'Inter', sans-serif; transition: background .1s;
+  }
+  .btn:hover { background: var(--bg); }
+  .btn-primary { background: var(--primary); color: #fff; border-color: var(--primary); }
+  .btn-primary:hover { background: #1e3a8a; border-color: #1e3a8a; }
+  .btn i { font-size: 15px; }
+
+  /* ── Action bar ── */
+  .action-bar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; }
+  .action-bar-left  { display: flex; gap: 8px; flex-wrap: wrap; }
+  .action-bar-right { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
+  /* ── Progress bar ── */
+  .prog-track { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+  .prog-fill  { height: 100%; border-radius: 3px; background: var(--primary); }
+
+  /* ── Pipeline kanban ── */
+  .pipeline { display: flex; gap: 14px; overflow-x: auto; padding-bottom: 6px; }
+  .pipe-col { min-width: 170px; flex-shrink: 0; }
+  .pipe-col-head {
+    font-size: 11px; font-weight: 600; color: var(--text-2);
+    text-transform: uppercase; letter-spacing: .05em;
+    padding: 6px 10px; background: var(--bg);
+    border-radius: var(--radius-sm); margin-bottom: 10px;
+    border: 1px solid var(--border);
+  }
+  .pipe-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 12px; margin-bottom: 10px;
+  }
+  .pipe-card-title { font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+  .pipe-card-sub   { font-size: 11px; color: var(--text-2); }
+  .pipe-card-val   { font-size: 12px; font-weight: 600; color: var(--primary-text); margin-top: 8px; }
+
+  /* ── Stage pipeline ── */
+  .stages { display: flex; align-items: center; margin: 6px 0 14px; gap: 0; }
+  .stage-wrap { display: flex; flex-direction: column; align-items: center; gap: 4px; flex-shrink: 0; }
+  .stage-dot {
+    width: 30px; height: 30px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 600;
+  }
+  .stage-dot.done    { background: var(--primary); color: #fff; }
+  .stage-dot.active  { background: #D97706; color: #fff; }
+  .stage-dot.pending { background: var(--border); color: var(--text-3); }
+  .stage-label { font-size: 10px; color: var(--text-3); text-align: center; max-width: 56px; }
+  .stage-label.active-label { color: #D97706; font-weight: 600; }
+  .stage-line       { flex: 1; height: 2px; background: var(--border); }
+  .stage-line.done  { background: var(--primary); }
+
+  /* ── Inventory grid ── */
+  .inv-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 20px; }
+  .inv-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 16px;
+  }
+  .inv-card.critical { border-color: var(--danger-border); background: var(--danger-bg); }
+  .inv-card.low      { border-color: var(--warn-border);   background: var(--warn-bg); }
+  .inv-name  { font-size: 12px; font-weight: 500; color: var(--text); margin-bottom: 8px; }
+  .inv-count { font-size: 26px; font-weight: 700; line-height: 1; margin-bottom: 4px; }
+  .inv-meta  { font-size: 11px; color: var(--text-3); }
+
+  /* ── AMC rows ── */
+  .amc-item {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 0; border-bottom: 1px solid var(--border);
+  }
+  .amc-item:last-child { border-bottom: none; }
+  .amc-name   { font-size: 13px; font-weight: 500; }
+  .amc-detail { font-size: 11px; color: var(--text-3); margin-top: 2px; }
+
+  /* ── Mobile punch card ── */
+  .punch-card {
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 22px; text-align: center; margin-bottom: 14px;
+  }
+  .punch-user  { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+  .punch-date  { font-size: 12px; color: var(--text-3); margin-bottom: 12px; }
+  .punch-loc   { font-size: 11px; color: var(--text-2); margin-bottom: 18px; display: flex; align-items: center; justify-content: center; gap: 4px; }
+  .punch-btns  { display: flex; gap: 14px; justify-content: center; }
+  .punch-in, .punch-out {
+    padding: 12px 28px; border-radius: var(--radius);
+    font-size: 14px; font-weight: 600; cursor: pointer;
+    display: flex; align-items: center; gap: 6px; border: none;
+    font-family: 'Inter', sans-serif;
+  }
+  .punch-in  { background: #166534; color: #fff; }
+  .punch-out { background: #991B1B; color: #fff; }
+  .punch-in:hover  { background: #14532D; }
+  .punch-out:hover { background: #7F1D1D; }
+
+  /* ── Calendar attendance ── */
+  .cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 4px; }
+  .cal-head { font-size: 10px; font-weight: 600; color: var(--text-3); text-align: center; padding: 4px 0; text-transform: uppercase; letter-spacing: .04em; }
+  .cal-day  { border-radius: var(--radius-sm); padding: 7px 0; text-align: center; font-size: 12px; font-weight: 500; }
+  .cal-day.present { background: var(--success-bg); color: var(--success-text); border: 1px solid var(--success-border); }
+  .cal-day.absent  { background: var(--danger-bg);  color: var(--danger-text);  border: 1px solid var(--danger-border); }
+  .cal-day.late    { background: var(--warn-bg);    color: var(--warn-text);    border: 1px solid var(--warn-border); }
+  .cal-day.off     { background: var(--bg); color: var(--text-3); border: 1px solid var(--border); }
+
+  /* ── Cal legend ── */
+  .cal-legend { display: flex; gap: 14px; margin-bottom: 12px; }
+  .leg-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text-2); }
+  .leg-swatch { width: 12px; height: 12px; border-radius: 3px; }
+
+  /* ── Finance row ── */
+  .fin-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 0; border-bottom: 1px solid var(--border);
+  }
+  .fin-row:last-child { border-bottom: none; }
+  .fin-label { font-size: 13px; color: var(--text-2); }
+  .fin-val   { font-size: 13px; font-weight: 600; }
+
+  /* ── Odometer entry ── */
+  .odo-box {
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 20px;
+  }
+  .odo-user  { font-size: 13px; font-weight: 600; margin-bottom: 16px; }
+  .odo-field { margin-bottom: 14px; }
+  .odo-field label { font-size: 11px; font-weight: 500; color: var(--text-3); display: block; margin-bottom: 5px; text-transform: uppercase; letter-spacing: .04em; }
+  .odo-field input {
+    width: 100%; padding: 10px 12px;
+    background: var(--surface); border: 1px solid var(--border2);
+    border-radius: var(--radius-sm); font-size: 16px; font-weight: 600;
+    font-family: 'Inter', sans-serif; color: var(--text);
+    outline: none;
+  }
+  .odo-field input:focus { border-color: var(--primary); }
+  .odo-result {
+    border-top: 1px solid var(--border); padding-top: 14px; margin-top: 4px;
+  }
+  .odo-result-row { display: flex; justify-content: space-between; padding: 5px 0; font-size: 13px; }
+  .odo-result-row.total .odo-result-val { font-size: 18px; font-weight: 700; color: var(--success-text); }
+
+  /* ── Map placeholder ── */
+  .map-ph {
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: var(--radius); height: 170px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 8px; color: var(--text-3); font-size: 12px;
+  }
+  .map-ph i { font-size: 32px; }
+
+  /* ── Reports grid ── */
+  .report-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; }
+  .report-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 20px;
+    cursor: pointer; transition: border-color .15s, background .15s;
+  }
+  .report-card:hover { border-color: var(--primary); background: var(--primary-light); }
+  .report-card i { font-size: 28px; color: var(--primary); margin-bottom: 10px; display: block; }
+  .report-card-title { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+  .report-card-sub   { font-size: 11px; color: var(--text-3); margin-bottom: 12px; }
+  .report-btns { display: flex; gap: 6px; }
+
+  /* ── Scrollbar ── */
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 10px; }
 </style>
-<h2 class="sr-only">ElevateERP — full-featured demo ERP for elevator installation, maintenance and service management</h2>
+</head>
+<body>
 
-<div class="erp-shell">
-  <div class="sidebar">
+<div class="shell">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
     <div class="brand">
-      <div style="display:flex;align-items:center;gap:8px">
-        <i class="ti ti-elevator" style="font-size:20px;color:#185FA5" aria-hidden="true"></i>
-        <div>
-          <div class="brand-name">ElevateERP</div>
-          <div class="brand-sub">Elevator Management</div>
-        </div>
+      <div class="brand-icon"><i class="ti ti-elevator"></i></div>
+      <div>
+        <div class="brand-name">ElevateERP</div>
+        <div class="brand-sub">Elevator Management</div>
       </div>
     </div>
 
-    <div style="padding:10px 12px 6px;border-bottom:0.5px solid var(--color-border-tertiary)">
-      <div style="display:flex;align-items:center;gap:8px;padding:6px 4px">
-        <div style="width:30px;height:30px;border-radius:50%;background:var(--color-background-info);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;color:var(--color-text-info)">RA</div>
-        <div>
-          <div style="font-size:12px;font-weight:500">Rajan Admin</div>
-          <div class="role-badge"><i class="ti ti-shield" style="font-size:11px" aria-hidden="true"></i>Super Admin</div>
-        </div>
+    <div class="user-row">
+      <div class="avatar">RA</div>
+      <div>
+        <div class="user-name">Rajan Admin</div>
+        <div class="user-role">Super Admin</div>
       </div>
     </div>
 
-    <div style="flex:1;overflow-y:auto">
-      <div class="nav-group">
-        <div class="nav-label">Main</div>
-        <div class="nav-item active" onclick="switchView('dashboard')"><i class="ti ti-layout-dashboard" aria-hidden="true"></i>Dashboard</div>
-        <div class="nav-item" onclick="switchView('sales')"><i class="ti ti-receipt" aria-hidden="true"></i>Sales & CRM</div>
-        <div class="nav-item" onclick="switchView('projects')"><i class="ti ti-building-skyscraper" aria-hidden="true"></i>Projects</div>
-        <div class="nav-item" onclick="switchView('service')"><i class="ti ti-tool" aria-hidden="true"></i>Service & AMC</div>
-      </div>
-      <div class="nav-group">
-        <div class="nav-label">Operations</div>
-        <div class="nav-item" onclick="switchView('inventory')"><i class="ti ti-packages" aria-hidden="true"></i>Inventory</div>
-        <div class="nav-item" onclick="switchView('procurement')"><i class="ti ti-truck-delivery" aria-hidden="true"></i>Procurement</div>
-        <div class="nav-item" onclick="switchView('finance')"><i class="ti ti-coins" aria-hidden="true"></i>Finance</div>
-      </div>
-      <div class="nav-group">
-        <div class="nav-label">HR & Field</div>
-        <div class="nav-item" onclick="switchView('attendance')"><i class="ti ti-user-check" aria-hidden="true"></i>Attendance</div>
-        <div class="nav-item" onclick="switchView('location')"><i class="ti ti-map-pin" aria-hidden="true"></i>Field Tracking</div>
-        <div class="nav-item" onclick="switchView('petrol')"><i class="ti ti-fuel" aria-hidden="true"></i>Travel Expense</div>
-      </div>
-      <div class="nav-group">
-        <div class="nav-label">System</div>
-        <div class="nav-item" onclick="switchView('reports')"><i class="ti ti-chart-bar" aria-hidden="true"></i>Reports</div>
-        <div class="nav-item" onclick="switchView('settings')"><i class="ti ti-settings" aria-hidden="true"></i>Settings & Roles</div>
-      </div>
+    <div class="nav-section">
+      <div class="nav-group-label">Main</div>
+      <div class="nav-item active" onclick="go('dashboard')"><i class="ti ti-layout-dashboard"></i>Dashboard</div>
+      <div class="nav-item" onclick="go('sales')"><i class="ti ti-receipt"></i>Sales & CRM</div>
+      <div class="nav-item" onclick="go('projects')"><i class="ti ti-building-skyscraper"></i>Projects</div>
+      <div class="nav-item" onclick="go('service')"><i class="ti ti-tool"></i>Service & AMC</div>
     </div>
-  </div>
+    <div class="nav-section">
+      <div class="nav-group-label">Operations</div>
+      <div class="nav-item" onclick="go('inventory')"><i class="ti ti-packages"></i>Inventory</div>
+      <div class="nav-item" onclick="go('procurement')"><i class="ti ti-truck-delivery"></i>Procurement</div>
+      <div class="nav-item" onclick="go('finance')"><i class="ti ti-coins"></i>Finance</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-group-label">HR & Field</div>
+      <div class="nav-item" onclick="go('attendance')"><i class="ti ti-user-check"></i>Attendance</div>
+      <div class="nav-item" onclick="go('location')"><i class="ti ti-map-pin"></i>Field Tracking</div>
+      <div class="nav-item" onclick="go('petrol')"><i class="ti ti-fuel"></i>Travel Expense</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-group-label">System</div>
+      <div class="nav-item" onclick="go('reports')"><i class="ti ti-chart-bar"></i>Reports</div>
+      <div class="nav-item" onclick="go('settings')"><i class="ti ti-settings"></i>Settings & Roles</div>
+    </div>
+  </aside>
 
-  <div class="main">
+  <!-- MAIN -->
+  <main class="main">
 
-    <!-- DASHBOARD -->
+    <!-- ═══ DASHBOARD ═══ -->
     <div class="view active" id="view-dashboard">
       <div class="page-header">
         <div class="page-title">Management Dashboard</div>
-        <div class="page-sub">Monday, 9 June 2026 — Chennai Region</div>
+        <div class="page-sub">Tuesday, 9 June 2026 &nbsp;·&nbsp; Chennai Region</div>
       </div>
       <div class="metrics-row">
-        <div class="metric"><div class="metric-label">Active Projects</div><div class="metric-value">18</div><div class="metric-delta up">↑ 3 this month</div></div>
-        <div class="metric"><div class="metric-label">AMC Customers</div><div class="metric-value">142</div><div class="metric-delta up">↑ 8 renewals</div></div>
-        <div class="metric"><div class="metric-label">Open Breakdowns</div><div class="metric-value">4</div><div class="metric-delta warn">2 overdue</div></div>
-        <div class="metric"><div class="metric-label">Monthly Revenue</div><div class="metric-value">₹38.2L</div><div class="metric-delta up">↑ 12% vs May</div></div>
-        <div class="metric"><div class="metric-label">Outstanding AR</div><div class="metric-value">₹11.4L</div><div class="metric-delta down">↓ due 3 clients</div></div>
-        <div class="metric"><div class="metric-label">Present Today</div><div class="metric-value">34/40</div><div class="metric-delta warn">4 late, 2 absent</div></div>
+        <div class="metric"><div class="metric-label">Active Projects</div><div class="metric-value">18</div><div class="metric-delta delta-up">↑ 3 this month</div></div>
+        <div class="metric"><div class="metric-label">AMC Customers</div><div class="metric-value">142</div><div class="metric-delta delta-up">↑ 8 renewals</div></div>
+        <div class="metric"><div class="metric-label">Open Breakdowns</div><div class="metric-value">4</div><div class="metric-delta delta-warn">2 overdue</div></div>
+        <div class="metric"><div class="metric-label">Monthly Revenue</div><div class="metric-value">₹38.2L</div><div class="metric-delta delta-up">↑ 12% vs May</div></div>
+        <div class="metric"><div class="metric-label">Outstanding AR</div><div class="metric-value">₹11.4L</div><div class="metric-delta delta-down">3 overdue clients</div></div>
+        <div class="metric"><div class="metric-label">Present Today</div><div class="metric-value">34 / 40</div><div class="metric-delta delta-warn">4 late · 2 absent</div></div>
       </div>
 
-      <div class="two-col">
+      <div class="col-2">
         <div class="card">
           <div class="card-title">Project Pipeline</div>
           <div class="pipeline">
             <div class="pipe-col">
-              <div class="pipe-col-title">Site Survey</div>
+              <div class="pipe-col-head">Site Survey</div>
               <div class="pipe-card"><div class="pipe-card-title">Prestige Tower B</div><div class="pipe-card-sub">Andheri, Mumbai</div><div class="pipe-card-val">₹8.4L</div></div>
               <div class="pipe-card"><div class="pipe-card-title">Skyline Residency</div><div class="pipe-card-sub">Velachery, Chennai</div><div class="pipe-card-val">₹5.1L</div></div>
             </div>
             <div class="pipe-col">
-              <div class="pipe-col-title">Installation</div>
+              <div class="pipe-col-head">Installation</div>
               <div class="pipe-card"><div class="pipe-card-title">DLF Cyber Park</div><div class="pipe-card-sub">Gurugram</div><div class="pipe-card-val">₹22.6L</div></div>
               <div class="pipe-card"><div class="pipe-card-title">Mantri Pinnacle</div><div class="pipe-card-sub">Bengaluru</div><div class="pipe-card-val">₹14.3L</div></div>
             </div>
             <div class="pipe-col">
-              <div class="pipe-col-title">Testing</div>
+              <div class="pipe-col-head">Testing</div>
               <div class="pipe-card"><div class="pipe-card-title">Golden Gate Apts</div><div class="pipe-card-sub">Pune</div><div class="pipe-card-val">₹7.8L</div></div>
             </div>
             <div class="pipe-col">
-              <div class="pipe-col-title">Handover</div>
+              <div class="pipe-col-head">Handover</div>
               <div class="pipe-card"><div class="pipe-card-title">HDFC HQ Wing C</div><div class="pipe-card-sub">Mumbai</div><div class="pipe-card-val">₹31.0L</div></div>
             </div>
           </div>
         </div>
         <div class="card">
           <div class="card-title">Revenue — Last 6 Months</div>
-          <div style="position:relative;width:100%;height:180px"><canvas id="revChart" role="img" aria-label="Bar chart of monthly revenue from Jan to June 2026">Revenue Jan–Jun: 28, 31, 26, 34, 34, 38 lakhs.</canvas></div>
+          <div style="position:relative;width:100%;height:190px">
+            <canvas id="revChart" role="img" aria-label="Bar chart monthly revenue Jan to Jun 2026">28,31,26,34,34,38 lakhs</canvas>
+          </div>
         </div>
       </div>
 
-      <div class="two-col">
+      <div class="col-2">
         <div class="card">
           <div class="card-title">Today's Breakdown Calls</div>
-          <table>
+          <div class="tbl-wrap"><table>
             <thead><tr><th>Customer</th><th>Location</th><th>Technician</th><th>Status</th></tr></thead>
             <tbody>
-              <tr><td>Sobha City</td><td>Anna Nagar</td><td>Karthik R</td><td><span class="badge badge-danger">Overdue</span></td></tr>
-              <tr><td>Tata Housing</td><td>Sholinganallur</td><td>Murugan S</td><td><span class="badge badge-warning">In Progress</span></td></tr>
+              <tr><td>Sobha City</td><td>Anna Nagar</td><td>Arjun K</td><td><span class="badge badge-danger">Overdue</span></td></tr>
+              <tr><td>Tata Housing</td><td>Sholinganallur</td><td>Murugan S</td><td><span class="badge badge-warn">In Progress</span></td></tr>
               <tr><td>Godrej Nest</td><td>Thoraipakkam</td><td>Santhosh P</td><td><span class="badge badge-success">Resolved</span></td></tr>
               <tr><td>Marina Mall</td><td>Besant Nagar</td><td>Vijay K</td><td><span class="badge badge-info">Assigned</span></td></tr>
             </tbody>
-          </table>
+          </table></div>
         </div>
         <div class="card">
           <div class="card-title">Inventory Alerts</div>
-          <table>
+          <div class="tbl-wrap"><table>
             <thead><tr><th>Part</th><th>Stock</th><th>Min</th><th>Status</th></tr></thead>
             <tbody>
-              <tr><td>Control Panels</td><td>2</td><td>5</td><td><span class="badge badge-danger">Low</span></td></tr>
+              <tr><td>Control Panels</td><td>2</td><td>5</td><td><span class="badge badge-danger">Critical</span></td></tr>
               <tr><td>Steel Cables (m)</td><td>180</td><td>100</td><td><span class="badge badge-success">OK</span></td></tr>
-              <tr><td>Safety Sensors</td><td>6</td><td>10</td><td><span class="badge badge-warning">Low</span></td></tr>
+              <tr><td>Safety Sensors</td><td>6</td><td>10</td><td><span class="badge badge-warn">Low</span></td></tr>
               <tr><td>Landing Doors</td><td>12</td><td>8</td><td><span class="badge badge-success">OK</span></td></tr>
               <tr><td>Elevator Motors</td><td>1</td><td>3</td><td><span class="badge badge-danger">Critical</span></td></tr>
             </tbody>
-          </table>
+          </table></div>
         </div>
       </div>
     </div>
 
-    <!-- SALES -->
+    <!-- ═══ SALES ═══ -->
     <div class="view" id="view-sales">
       <div class="page-header"><div class="page-title">Sales & Customer Management</div><div class="page-sub">Quotations, orders, invoices and customer accounts</div></div>
       <div class="action-bar">
-        <div style="display:flex;gap:8px">
-          <button class="btn btn-primary"><i class="ti ti-plus" aria-hidden="true"></i>New Quotation</button>
-          <button class="btn"><i class="ti ti-user-plus" aria-hidden="true"></i>Add Customer</button>
+        <div class="action-bar-left">
+          <button class="btn btn-primary"><i class="ti ti-plus"></i>New Quotation</button>
+          <button class="btn"><i class="ti ti-user-plus"></i>Add Customer</button>
         </div>
-        <div style="display:flex;gap:6px">
+        <div class="action-bar-right">
           <span class="badge badge-info">12 Open Quotes</span>
-          <span class="badge badge-warning">5 Pending Orders</span>
+          <span class="badge badge-warn">5 Pending Orders</span>
           <span class="badge badge-success">8 Invoiced</span>
         </div>
       </div>
@@ -236,300 +508,297 @@ tr:hover td{background:var(--color-background-secondary)}
       </div>
       <div class="card">
         <div class="card-title">Recent Quotations</div>
-        <table>
+        <div class="tbl-wrap"><table>
           <thead><tr><th>Quote #</th><th>Customer</th><th>Project</th><th>Value</th><th>Date</th><th>Status</th><th>Action</th></tr></thead>
           <tbody>
-            <tr><td>QT-2026-048</td><td>Prestige Group</td><td>Tower B – 4 lifts</td><td>₹33.6L</td><td>05 Jun</td><td><span class="badge badge-warning">Sent</span></td><td><span class="badge badge-info" style="cursor:pointer">Convert</span></td></tr>
+            <tr><td>QT-2026-048</td><td>Prestige Group</td><td>Tower B – 4 lifts</td><td>₹33.6L</td><td>05 Jun</td><td><span class="badge badge-warn">Sent</span></td><td><span class="badge badge-info" style="cursor:pointer">Convert →</span></td></tr>
             <tr><td>QT-2026-047</td><td>DLF Ltd</td><td>Phase 3 – 8 lifts</td><td>₹71.2L</td><td>04 Jun</td><td><span class="badge badge-success">Accepted</span></td><td><span class="badge badge-gray" style="cursor:pointer">View SO</span></td></tr>
             <tr><td>QT-2026-046</td><td>Sobha Developers</td><td>Villa lifts × 12</td><td>₹18.0L</td><td>02 Jun</td><td><span class="badge badge-danger">Rejected</span></td><td><span class="badge badge-gray" style="cursor:pointer">Revise</span></td></tr>
             <tr><td>QT-2026-045</td><td>Marina Mall</td><td>Escalator retrofit</td><td>₹9.5L</td><td>01 Jun</td><td><span class="badge badge-info">Draft</span></td><td><span class="badge badge-info" style="cursor:pointer">Send</span></td></tr>
             <tr><td>QT-2026-044</td><td>Tata Housing</td><td>Smart lift – 6 units</td><td>₹44.8L</td><td>28 May</td><td><span class="badge badge-success">Accepted</span></td><td><span class="badge badge-gray" style="cursor:pointer">Invoice</span></td></tr>
           </tbody>
-        </table>
+        </table></div>
       </div>
-      <div class="two-col">
+      <div class="col-2">
         <div class="card">
           <div class="card-title">Payment Milestones — DLF Phase 3</div>
-          <table>
-            <thead><tr><th>Milestone</th><th>Amount</th><th>Due</th><th>Status</th></tr></thead>
+          <div class="tbl-wrap"><table>
+            <thead><tr><th>Milestone</th><th>Amount</th><th>Due Date</th><th>Status</th></tr></thead>
             <tbody>
               <tr><td>Advance (30%)</td><td>₹21.4L</td><td>10 Jun</td><td><span class="badge badge-success">Received</span></td></tr>
-              <tr><td>On Delivery (30%)</td><td>₹21.4L</td><td>15 Jul</td><td><span class="badge badge-warning">Pending</span></td></tr>
+              <tr><td>On Delivery (30%)</td><td>₹21.4L</td><td>15 Jul</td><td><span class="badge badge-warn">Pending</span></td></tr>
               <tr><td>On Testing (20%)</td><td>₹14.2L</td><td>01 Sep</td><td><span class="badge badge-gray">Future</span></td></tr>
               <tr><td>Handover (20%)</td><td>₹14.2L</td><td>01 Oct</td><td><span class="badge badge-gray">Future</span></td></tr>
             </tbody>
-          </table>
+          </table></div>
         </div>
         <div class="card">
           <div class="card-title">Top Customers by Revenue</div>
-          <div style="position:relative;width:100%;height:170px"><canvas id="custChart" role="img" aria-label="Horizontal bar chart of top customers by revenue">DLF 71L, Prestige 34L, Tata 45L, Sobha 18L, Godrej 22L</canvas></div>
+          <div style="position:relative;width:100%;height:200px">
+            <canvas id="custChart" role="img" aria-label="Horizontal bar chart top customers by revenue">DLF 71L, Tata 45L, Prestige 34L, Godrej 22L, Sobha 18L</canvas>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- PROJECTS -->
+    <!-- ═══ PROJECTS ═══ -->
     <div class="view" id="view-projects">
       <div class="page-header"><div class="page-title">Project Management</div><div class="page-sub">Installation tracking from site survey to handover</div></div>
       <div class="metrics-row">
         <div class="metric"><div class="metric-label">Active Projects</div><div class="metric-value">18</div></div>
-        <div class="metric"><div class="metric-label">On Schedule</div><div class="metric-value">13</div><div class="metric-delta up">72%</div></div>
-        <div class="metric"><div class="metric-label">Delayed</div><div class="metric-value">5</div><div class="metric-delta down">need attention</div></div>
+        <div class="metric"><div class="metric-label">On Schedule</div><div class="metric-value">13</div><div class="metric-delta delta-up">72% on time</div></div>
+        <div class="metric"><div class="metric-label">Delayed</div><div class="metric-value">5</div><div class="metric-delta delta-down">need attention</div></div>
         <div class="metric"><div class="metric-label">Completed YTD</div><div class="metric-value">27</div></div>
       </div>
+
       <div class="card">
         <div class="card-title">DLF Cyber Park — Project Detail</div>
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;margin-bottom:18px">
           <div>
-            <div style="font-size:13px;color:var(--color-text-secondary)">Project Manager: <b>Arjun Mehta</b> &nbsp;|&nbsp; Team: Karthik, Murugan, Santhosh</div>
-            <div style="font-size:13px;color:var(--color-text-secondary);margin-top:3px">Contract: ₹22.6L &nbsp;|&nbsp; Start: 15 Apr 2026 &nbsp;|&nbsp; Target: 30 Jul 2026</div>
+            <div style="font-size:13px;color:var(--text-2);margin-bottom:3px">Project Manager: <strong>Arjun Mehta</strong> &nbsp;·&nbsp; Team: Arjun K, Murugan, Santhosh</div>
+            <div style="font-size:13px;color:var(--text-2)">Contract: ₹22.6L &nbsp;·&nbsp; Start: 15 Apr 2026 &nbsp;·&nbsp; Target: 30 Jul 2026</div>
           </div>
-          <span class="badge badge-warning">In Progress — 62%</span>
+          <span class="badge badge-warn" style="font-size:12px;padding:5px 12px">In Progress — 62%</span>
         </div>
-        <div style="margin-bottom:10px">
-          <div class="proj-stage" style="align-items:flex-start">
-            <div style="display:flex;flex-direction:column;align-items:center;gap:0;width:28px">
-              <div class="stage-dot done"><i class="ti ti-check" style="font-size:12px" aria-hidden="true"></i></div>
-            </div>
-            <div class="stage-line done"></div>
-            <div style="display:flex;flex-direction:column;align-items:center;width:28px"><div class="stage-dot done"><i class="ti ti-check" style="font-size:12px" aria-hidden="true"></i></div></div>
-            <div class="stage-line done"></div>
-            <div style="display:flex;flex-direction:column;align-items:center;width:28px"><div class="stage-dot done"><i class="ti ti-check" style="font-size:12px" aria-hidden="true"></i></div></div>
-            <div class="stage-line done"></div>
-            <div style="display:flex;flex-direction:column;align-items:center;width:28px"><div class="stage-dot done"><i class="ti ti-check" style="font-size:12px" aria-hidden="true"></i></div></div>
-            <div class="stage-line"></div>
-            <div style="display:flex;flex-direction:column;align-items:center;width:28px"><div class="stage-dot active"><i class="ti ti-loader" style="font-size:12px" aria-hidden="true"></i></div></div>
-            <div class="stage-line"></div>
-            <div style="display:flex;flex-direction:column;align-items:center;width:28px"><div class="stage-dot pending">6</div></div>
-            <div class="stage-line"></div>
-            <div style="display:flex;flex-direction:column;align-items:center;width:28px"><div class="stage-dot pending">7</div></div>
-            <div class="stage-line"></div>
-            <div style="display:flex;flex-direction:column;align-items:center;width:28px"><div class="stage-dot pending">8</div></div>
-          </div>
-          <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--color-text-secondary);margin-top:6px;padding:0 2px">
-            <span>Survey</span><span>Shaft</span><span>Procure</span><span>Deliver</span><span style="color:#F59E0B;font-weight:500">Install</span><span>Test</span><span>Commis.</span><span>Handover</span>
-          </div>
+
+        <div class="stages">
+          <div class="stage-wrap"><div class="stage-dot done"><i class="ti ti-check"></i></div><div class="stage-label">Survey</div></div>
+          <div class="stage-line done"></div>
+          <div class="stage-wrap"><div class="stage-dot done"><i class="ti ti-check"></i></div><div class="stage-label">Shaft</div></div>
+          <div class="stage-line done"></div>
+          <div class="stage-wrap"><div class="stage-dot done"><i class="ti ti-check"></i></div><div class="stage-label">Procure</div></div>
+          <div class="stage-line done"></div>
+          <div class="stage-wrap"><div class="stage-dot done"><i class="ti ti-check"></i></div><div class="stage-label">Deliver</div></div>
+          <div class="stage-line done"></div>
+          <div class="stage-wrap"><div class="stage-dot active"><i class="ti ti-loader"></i></div><div class="stage-label active-label">Install</div></div>
+          <div class="stage-line"></div>
+          <div class="stage-wrap"><div class="stage-dot pending">6</div><div class="stage-label">Test</div></div>
+          <div class="stage-line"></div>
+          <div class="stage-wrap"><div class="stage-dot pending">7</div><div class="stage-label">Commis.</div></div>
+          <div class="stage-line"></div>
+          <div class="stage-wrap"><div class="stage-dot pending">8</div><div class="stage-label">Handover</div></div>
         </div>
+
         <div style="margin-top:10px">
-          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--color-text-secondary);margin-bottom:4px"><span>Overall Progress</span><span>62%</span></div>
-          <div class="progress-bar"><div class="progress-fill" style="width:62%"></div></div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-2);margin-bottom:6px"><span>Overall Progress</span><span style="font-weight:600">62%</span></div>
+          <div class="prog-track"><div class="prog-fill" style="width:62%"></div></div>
         </div>
       </div>
+
       <div class="card">
         <div class="card-title">All Active Projects</div>
-        <table>
-          <thead><tr><th>Project</th><th>Customer</th><th>Value</th><th>Stage</th><th>Progress</th><th>Deadline</th><th>Status</th></tr></thead>
+        <div class="tbl-wrap"><table>
+          <thead><tr><th>Project</th><th>Customer</th><th>Value</th><th>Stage</th><th style="min-width:100px">Progress</th><th>Deadline</th><th>Status</th></tr></thead>
           <tbody>
-            <tr><td>DLF Cyber Park</td><td>DLF Ltd</td><td>₹22.6L</td><td>Installation</td><td><div class="progress-bar" style="width:80px"><div class="progress-fill" style="width:62%"></div></div></td><td>30 Jul</td><td><span class="badge badge-warning">On Track</span></td></tr>
-            <tr><td>Prestige Tower B</td><td>Prestige</td><td>₹33.6L</td><td>Site Survey</td><td><div class="progress-bar" style="width:80px"><div class="progress-fill" style="width:10%"></div></div></td><td>15 Nov</td><td><span class="badge badge-info">New</span></td></tr>
-            <tr><td>HDFC HQ Wing C</td><td>HDFC</td><td>₹31.0L</td><td>Handover</td><td><div class="progress-bar" style="width:80px"><div class="progress-fill" style="width:95%"></div></div></td><td>12 Jun</td><td><span class="badge badge-success">Near Done</span></td></tr>
-            <tr><td>Golden Gate Apts</td><td>Sobha</td><td>₹7.8L</td><td>Testing</td><td><div class="progress-bar" style="width:80px"><div class="progress-fill" style="width:82%"></div></div></td><td>20 Jun</td><td><span class="badge badge-danger">Delayed</span></td></tr>
-            <tr><td>Mantri Pinnacle</td><td>Mantri</td><td>₹14.3L</td><td>Installation</td><td><div class="progress-bar" style="width:80px"><div class="progress-fill" style="width:55%"></div></div></td><td>10 Aug</td><td><span class="badge badge-warning">On Track</span></td></tr>
+            <tr><td>DLF Cyber Park</td><td>DLF Ltd</td><td>₹22.6L</td><td>Installation</td><td><div class="prog-track" style="width:100px"><div class="prog-fill" style="width:62%"></div></div></td><td>30 Jul</td><td><span class="badge badge-warn">On Track</span></td></tr>
+            <tr><td>Prestige Tower B</td><td>Prestige</td><td>₹33.6L</td><td>Site Survey</td><td><div class="prog-track" style="width:100px"><div class="prog-fill" style="width:10%"></div></div></td><td>15 Nov</td><td><span class="badge badge-info">New</span></td></tr>
+            <tr><td>HDFC HQ Wing C</td><td>HDFC</td><td>₹31.0L</td><td>Handover</td><td><div class="prog-track" style="width:100px"><div class="prog-fill" style="width:95%"></div></div></td><td>12 Jun</td><td><span class="badge badge-success">Near Done</span></td></tr>
+            <tr><td>Golden Gate Apts</td><td>Sobha</td><td>₹7.8L</td><td>Testing</td><td><div class="prog-track" style="width:100px"><div class="prog-fill" style="width:82%"></div></div></td><td>20 Jun</td><td><span class="badge badge-danger">Delayed</span></td></tr>
+            <tr><td>Mantri Pinnacle</td><td>Mantri</td><td>₹14.3L</td><td>Installation</td><td><div class="prog-track" style="width:100px"><div class="prog-fill" style="width:55%"></div></div></td><td>10 Aug</td><td><span class="badge badge-warn">On Track</span></td></tr>
           </tbody>
-        </table>
+        </table></div>
       </div>
     </div>
 
-    <!-- SERVICE & AMC -->
+    <!-- ═══ SERVICE ═══ -->
     <div class="view" id="view-service">
       <div class="page-header"><div class="page-title">Service & AMC Management</div><div class="page-sub">Maintenance contracts, breakdown calls, technician dispatch</div></div>
       <div class="metrics-row">
         <div class="metric"><div class="metric-label">AMC Active</div><div class="metric-value">142</div></div>
-        <div class="metric"><div class="metric-label">Expiring in 30d</div><div class="metric-value">11</div><div class="metric-delta warn">send reminders</div></div>
+        <div class="metric"><div class="metric-label">Expiring in 30d</div><div class="metric-value">11</div><div class="metric-delta delta-warn">send reminders</div></div>
         <div class="metric"><div class="metric-label">Open Breakdowns</div><div class="metric-value">4</div></div>
-        <div class="metric"><div class="metric-label">MTTR (hrs)</div><div class="metric-value">3.2</div><div class="metric-delta up">↓ 0.4 improved</div></div>
+        <div class="metric"><div class="metric-label">Avg Response (hrs)</div><div class="metric-value">3.2</div><div class="metric-delta delta-up">↓ 0.4 improved</div></div>
       </div>
-      <div class="two-col">
+      <div class="col-2">
         <div class="card">
           <div class="card-title">AMC Contracts — Expiring Soon</div>
-          <div class="amc-row"><div><div class="amc-name">Sobha City Towers</div><div class="amc-detail">4 lifts · ₹1.2L/yr</div></div><div><span class="badge badge-danger">Exp 14 Jun</span></div></div>
-          <div class="amc-row"><div><div class="amc-name">Marina Mall</div><div class="amc-detail">6 escalators · ₹2.4L/yr</div></div><div><span class="badge badge-danger">Exp 18 Jun</span></div></div>
-          <div class="amc-row"><div><div class="amc-name">Radha Nagar Apts</div><div class="amc-detail">2 lifts · ₹0.6L/yr</div></div><div><span class="badge badge-warning">Exp 29 Jun</span></div></div>
-          <div class="amc-row"><div><div class="amc-name">Sify Towers</div><div class="amc-detail">3 lifts · ₹0.9L/yr</div></div><div><span class="badge badge-warning">Exp 2 Jul</span></div></div>
+          <div class="amc-item"><div><div class="amc-name">Sobha City Towers</div><div class="amc-detail">4 lifts · ₹1.2L/yr</div></div><span class="badge badge-danger">Exp 14 Jun</span></div>
+          <div class="amc-item"><div><div class="amc-name">Marina Mall</div><div class="amc-detail">6 escalators · ₹2.4L/yr</div></div><span class="badge badge-danger">Exp 18 Jun</span></div>
+          <div class="amc-item"><div><div class="amc-name">Radha Nagar Apts</div><div class="amc-detail">2 lifts · ₹0.6L/yr</div></div><span class="badge badge-warn">Exp 29 Jun</span></div>
+          <div class="amc-item"><div><div class="amc-name">Sify Towers</div><div class="amc-detail">3 lifts · ₹0.9L/yr</div></div><span class="badge badge-warn">Exp 2 Jul</span></div>
         </div>
         <div class="card">
           <div class="card-title">Breakdown Calls — Today</div>
-          <table>
+          <div class="tbl-wrap"><table>
             <thead><tr><th>Call #</th><th>Customer</th><th>Fault</th><th>Tech</th><th>Status</th></tr></thead>
             <tbody>
-              <tr><td>BD-904</td><td>Sobha City</td><td>Door stuck</td><td>Karthik R</td><td><span class="badge badge-danger">Overdue</span></td></tr>
-              <tr><td>BD-903</td><td>Tata Housing</td><td>Motor fault</td><td>Murugan S</td><td><span class="badge badge-warning">In Progress</span></td></tr>
+              <tr><td>BD-904</td><td>Sobha City</td><td>Door stuck</td><td>Arjun K</td><td><span class="badge badge-danger">Overdue</span></td></tr>
+              <tr><td>BD-903</td><td>Tata Housing</td><td>Motor fault</td><td>Murugan S</td><td><span class="badge badge-warn">In Progress</span></td></tr>
               <tr><td>BD-902</td><td>Godrej Nest</td><td>Panel error</td><td>Santhosh P</td><td><span class="badge badge-success">Resolved</span></td></tr>
               <tr><td>BD-901</td><td>Marina Mall</td><td>Cable noise</td><td>Vijay K</td><td><span class="badge badge-info">En Route</span></td></tr>
             </tbody>
-          </table>
+          </table></div>
         </div>
       </div>
       <div class="card">
         <div class="card-title">Scheduled Preventive Maintenance — June 2026</div>
-        <table>
+        <div class="tbl-wrap"><table>
           <thead><tr><th>Customer</th><th>Unit</th><th>Scheduled</th><th>Technician</th><th>Last Service</th><th>Status</th></tr></thead>
           <tbody>
-            <tr><td>DLF Cyber Park</td><td>Lift #3</td><td>11 Jun</td><td>Karthik R</td><td>11 May</td><td><span class="badge badge-info">Scheduled</span></td></tr>
+            <tr><td>DLF Cyber Park</td><td>Lift #3</td><td>11 Jun</td><td>Arjun K</td><td>11 May</td><td><span class="badge badge-info">Scheduled</span></td></tr>
             <tr><td>Prestige Oaks</td><td>Lifts #1–4</td><td>13 Jun</td><td>Murugan S</td><td>13 May</td><td><span class="badge badge-info">Scheduled</span></td></tr>
             <tr><td>HDFC HQ</td><td>Lift #1</td><td>09 Jun</td><td>Santhosh P</td><td>09 May</td><td><span class="badge badge-success">Done</span></td></tr>
           </tbody>
-        </table>
+        </table></div>
       </div>
     </div>
 
-    <!-- INVENTORY -->
+    <!-- ═══ INVENTORY ═══ -->
     <div class="view" id="view-inventory">
       <div class="page-header"><div class="page-title">Inventory Management</div><div class="page-sub">Spare parts, stock levels, goods receipt and issue</div></div>
       <div class="inv-grid">
-        <div class="inv-card"><div class="inv-name">Elevator Motors</div><div class="inv-stock" style="color:var(--color-text-danger)">1</div><div class="inv-min">Min: 3 &nbsp;<span class="badge badge-danger">Critical</span></div></div>
-        <div class="inv-card"><div class="inv-name">Control Panels</div><div class="inv-stock" style="color:var(--color-text-danger)">2</div><div class="inv-min">Min: 5 &nbsp;<span class="badge badge-danger">Low</span></div></div>
-        <div class="inv-card"><div class="inv-name">Safety Sensors</div><div class="inv-stock" style="color:var(--color-text-warning)">6</div><div class="inv-min">Min: 10 &nbsp;<span class="badge badge-warning">Low</span></div></div>
-        <div class="inv-card"><div class="inv-name">Steel Cables (m)</div><div class="inv-stock" style="color:var(--color-text-success)">180</div><div class="inv-min">Min: 100 &nbsp;<span class="badge badge-success">OK</span></div></div>
-        <div class="inv-card"><div class="inv-name">Landing Doors</div><div class="inv-stock" style="color:var(--color-text-success)">12</div><div class="inv-min">Min: 8 &nbsp;<span class="badge badge-success">OK</span></div></div>
-        <div class="inv-card"><div class="inv-name">Guide Rails (m)</div><div class="inv-stock" style="color:var(--color-text-success)">240</div><div class="inv-min">Min: 80 &nbsp;<span class="badge badge-success">OK</span></div></div>
-        <div class="inv-card"><div class="inv-name">Counterweights</div><div class="inv-stock" style="color:var(--color-text-warning)">4</div><div class="inv-min">Min: 6 &nbsp;<span class="badge badge-warning">Low</span></div></div>
-        <div class="inv-card"><div class="inv-name">Limit Switches</div><div class="inv-stock" style="color:var(--color-text-success)">38</div><div class="inv-min">Min: 20 &nbsp;<span class="badge badge-success">OK</span></div></div>
+        <div class="inv-card critical"><div class="inv-name">Elevator Motors</div><div class="inv-count" style="color:#991B1B">1</div><div class="inv-meta">Min: 3 &nbsp;<span class="badge badge-danger">Critical</span></div></div>
+        <div class="inv-card critical"><div class="inv-name">Control Panels</div><div class="inv-count" style="color:#991B1B">2</div><div class="inv-meta">Min: 5 &nbsp;<span class="badge badge-danger">Critical</span></div></div>
+        <div class="inv-card low"><div class="inv-name">Safety Sensors</div><div class="inv-count" style="color:#92400E">6</div><div class="inv-meta">Min: 10 &nbsp;<span class="badge badge-warn">Low</span></div></div>
+        <div class="inv-card low"><div class="inv-name">Counterweights</div><div class="inv-count" style="color:#92400E">4</div><div class="inv-meta">Min: 6 &nbsp;<span class="badge badge-warn">Low</span></div></div>
+        <div class="inv-card"><div class="inv-name">Steel Cables (m)</div><div class="inv-count" style="color:#166534">180</div><div class="inv-meta">Min: 100 &nbsp;<span class="badge badge-success">OK</span></div></div>
+        <div class="inv-card"><div class="inv-name">Landing Doors</div><div class="inv-count" style="color:#166534">12</div><div class="inv-meta">Min: 8 &nbsp;<span class="badge badge-success">OK</span></div></div>
+        <div class="inv-card"><div class="inv-name">Guide Rails (m)</div><div class="inv-count" style="color:#166534">240</div><div class="inv-meta">Min: 80 &nbsp;<span class="badge badge-success">OK</span></div></div>
+        <div class="inv-card"><div class="inv-name">Limit Switches</div><div class="inv-count" style="color:#166634">38</div><div class="inv-meta">Min: 20 &nbsp;<span class="badge badge-success">OK</span></div></div>
       </div>
       <div class="card">
         <div class="card-title">Stock Movement History</div>
-        <table>
-          <thead><tr><th>Date</th><th>Part</th><th>Type</th><th>Qty</th><th>From/To</th><th>Ref</th></tr></thead>
+        <div class="tbl-wrap"><table>
+          <thead><tr><th>Date</th><th>Part</th><th>Type</th><th>Qty</th><th>From / To</th><th>Ref #</th></tr></thead>
           <tbody>
-            <tr><td>09 Jun</td><td>Control Panel</td><td><span class="badge badge-danger">Issue</span></td><td>-1</td><td>→ DLF Cyber Park</td><td>PRJ-018</td></tr>
-            <tr><td>08 Jun</td><td>Steel Cables</td><td><span class="badge badge-success">Receipt</span></td><td>+60m</td><td>← Thyssen Supply</td><td>PO-2026-041</td></tr>
-            <tr><td>07 Jun</td><td>Safety Sensors</td><td><span class="badge badge-danger">Issue</span></td><td>-2</td><td>→ Mantri Pinnacle</td><td>PRJ-015</td></tr>
+            <tr><td>09 Jun</td><td>Control Panel</td><td><span class="badge badge-danger">Issue</span></td><td>−1</td><td>→ DLF Cyber Park</td><td>PRJ-018</td></tr>
+            <tr><td>08 Jun</td><td>Steel Cables</td><td><span class="badge badge-success">Receipt</span></td><td>+60 m</td><td>← Thyssen Supply</td><td>PO-2026-041</td></tr>
+            <tr><td>07 Jun</td><td>Safety Sensors</td><td><span class="badge badge-danger">Issue</span></td><td>−2</td><td>→ Mantri Pinnacle</td><td>PRJ-015</td></tr>
             <tr><td>07 Jun</td><td>Landing Doors</td><td><span class="badge badge-success">Receipt</span></td><td>+4</td><td>← Schindler Parts</td><td>PO-2026-040</td></tr>
           </tbody>
-        </table>
+        </table></div>
       </div>
     </div>
 
-    <!-- PROCUREMENT -->
+    <!-- ═══ PROCUREMENT ═══ -->
     <div class="view" id="view-procurement">
       <div class="page-header"><div class="page-title">Procurement</div><div class="page-sub">Purchase orders, vendor management and payments</div></div>
       <div class="metrics-row">
         <div class="metric"><div class="metric-label">Open POs</div><div class="metric-value">7</div></div>
         <div class="metric"><div class="metric-label">Pending Payment</div><div class="metric-value">₹8.3L</div></div>
-        <div class="metric"><div class="metric-label">Auto PRs Raised</div><div class="metric-value">3</div><div class="metric-delta warn">low stock triggered</div></div>
+        <div class="metric"><div class="metric-label">Auto PRs Raised</div><div class="metric-value">3</div><div class="metric-delta delta-warn">low stock trigger</div></div>
         <div class="metric"><div class="metric-label">Active Vendors</div><div class="metric-value">24</div></div>
       </div>
       <div class="card">
         <div class="card-title">Purchase Orders</div>
-        <table>
+        <div class="tbl-wrap"><table>
           <thead><tr><th>PO #</th><th>Vendor</th><th>Items</th><th>Value</th><th>Date</th><th>Status</th></tr></thead>
           <tbody>
-            <tr><td>PO-2026-045</td><td>Thyssen Supply Co</td><td>Elevator Motors × 4</td><td>₹3.2L</td><td>08 Jun</td><td><span class="badge badge-warning">Pending Delivery</span></td></tr>
+            <tr><td>PO-2026-045</td><td>Thyssen Supply Co</td><td>Elevator Motors × 4</td><td>₹3.2L</td><td>08 Jun</td><td><span class="badge badge-warn">Pending Delivery</span></td></tr>
             <tr><td>PO-2026-044</td><td>KONE Parts India</td><td>Control Panels × 5</td><td>₹1.8L</td><td>07 Jun</td><td><span class="badge badge-info">Placed</span></td></tr>
             <tr><td>PO-2026-043</td><td>Schindler Parts</td><td>Safety Sensors × 10</td><td>₹0.6L</td><td>06 Jun</td><td><span class="badge badge-success">Delivered</span></td></tr>
-            <tr><td>PO-2026-042</td><td>Thyssen Supply Co</td><td>Steel Cables 100m</td><td>₹0.4L</td><td>04 Jun</td><td><span class="badge badge-success">Delivered</span></td></tr>
+            <tr><td>PO-2026-042</td><td>Thyssen Supply Co</td><td>Steel Cables 100 m</td><td>₹0.4L</td><td>04 Jun</td><td><span class="badge badge-success">Delivered</span></td></tr>
           </tbody>
-        </table>
+        </table></div>
       </div>
       <div class="card">
         <div class="card-title">Auto-generated Purchase Requisitions</div>
-        <table>
+        <div class="tbl-wrap"><table>
           <thead><tr><th>PR #</th><th>Part</th><th>Current Stock</th><th>Min Level</th><th>Qty Needed</th><th>Action</th></tr></thead>
           <tbody>
-            <tr><td>PR-088</td><td>Elevator Motors</td><td>1</td><td>3</td><td>5</td><td><span class="badge badge-info" style="cursor:pointer">Create PO</span></td></tr>
-            <tr><td>PR-087</td><td>Control Panels</td><td>2</td><td>5</td><td>8</td><td><span class="badge badge-info" style="cursor:pointer">Create PO</span></td></tr>
-            <tr><td>PR-086</td><td>Counterweights</td><td>4</td><td>6</td><td>4</td><td><span class="badge badge-info" style="cursor:pointer">Create PO</span></td></tr>
+            <tr><td>PR-088</td><td>Elevator Motors</td><td>1</td><td>3</td><td>5</td><td><button class="btn btn-primary" style="padding:5px 12px;font-size:11px"><i class="ti ti-plus"></i>Create PO</button></td></tr>
+            <tr><td>PR-087</td><td>Control Panels</td><td>2</td><td>5</td><td>8</td><td><button class="btn btn-primary" style="padding:5px 12px;font-size:11px"><i class="ti ti-plus"></i>Create PO</button></td></tr>
+            <tr><td>PR-086</td><td>Counterweights</td><td>4</td><td>6</td><td>4</td><td><button class="btn btn-primary" style="padding:5px 12px;font-size:11px"><i class="ti ti-plus"></i>Create PO</button></td></tr>
           </tbody>
-        </table>
+        </table></div>
       </div>
     </div>
 
-    <!-- FINANCE -->
+    <!-- ═══ FINANCE ═══ -->
     <div class="view" id="view-finance">
       <div class="page-header"><div class="page-title">Finance & Accounts</div><div class="page-sub">Invoicing, AR/AP, GST and financial reports</div></div>
       <div class="metrics-row">
-        <div class="metric"><div class="metric-label">Revenue (Jun)</div><div class="metric-value">₹38.2L</div><div class="metric-delta up">↑ 12%</div></div>
+        <div class="metric"><div class="metric-label">Revenue (Jun)</div><div class="metric-value">₹38.2L</div><div class="metric-delta delta-up">↑ 12%</div></div>
         <div class="metric"><div class="metric-label">Accounts Receivable</div><div class="metric-value">₹11.4L</div></div>
         <div class="metric"><div class="metric-label">Accounts Payable</div><div class="metric-value">₹8.3L</div></div>
         <div class="metric"><div class="metric-label">GST Due (Jun)</div><div class="metric-value">₹3.1L</div></div>
       </div>
-      <div class="two-col">
+      <div class="col-2">
         <div class="card">
           <div class="card-title">P&L Summary — June 2026</div>
           <div class="fin-row"><div class="fin-label">Installation Revenue</div><div class="fin-val">₹28.4L</div></div>
           <div class="fin-row"><div class="fin-label">AMC Revenue</div><div class="fin-val">₹6.2L</div></div>
           <div class="fin-row"><div class="fin-label">Service Revenue</div><div class="fin-val">₹3.6L</div></div>
-          <div class="fin-row" style="font-weight:500"><div class="fin-label">Total Revenue</div><div class="fin-val" style="color:var(--color-text-success)">₹38.2L</div></div>
-          <div class="fin-row"><div class="fin-label">Material Cost</div><div class="fin-val" style="color:var(--color-text-danger)">-₹18.1L</div></div>
-          <div class="fin-row"><div class="fin-label">Labour Cost</div><div class="fin-val" style="color:var(--color-text-danger)">-₹6.4L</div></div>
-          <div class="fin-row"><div class="fin-label">Overheads</div><div class="fin-val" style="color:var(--color-text-danger)">-₹3.2L</div></div>
-          <div class="fin-row" style="font-weight:500"><div class="fin-label">Net Profit</div><div class="fin-val" style="color:var(--color-text-success)">₹10.5L (27%)</div></div>
+          <div class="fin-row" style="background:var(--info-bg);padding:10px 8px;border-radius:var(--radius-sm);margin:6px 0"><div class="fin-label" style="font-weight:600">Total Revenue</div><div class="fin-val" style="color:var(--success-text)">₹38.2L</div></div>
+          <div class="fin-row"><div class="fin-label">Material Cost</div><div class="fin-val" style="color:var(--danger-text)">−₹18.1L</div></div>
+          <div class="fin-row"><div class="fin-label">Labour Cost</div><div class="fin-val" style="color:var(--danger-text)">−₹6.4L</div></div>
+          <div class="fin-row"><div class="fin-label">Overheads</div><div class="fin-val" style="color:var(--danger-text)">−₹3.2L</div></div>
+          <div class="fin-row" style="background:var(--success-bg);padding:10px 8px;border-radius:var(--radius-sm);margin-top:6px"><div class="fin-label" style="font-weight:600">Net Profit</div><div class="fin-val" style="color:var(--success-text)">₹10.5L (27%)</div></div>
         </div>
         <div class="card">
           <div class="card-title">Outstanding Receivables</div>
-          <table>
+          <div class="tbl-wrap"><table>
             <thead><tr><th>Customer</th><th>Invoice</th><th>Amount</th><th>Due</th><th>Status</th></tr></thead>
             <tbody>
-              <tr><td>DLF Ltd</td><td>INV-338</td><td>₹4.8L</td><td>15 Jun</td><td><span class="badge badge-warning">Due Soon</span></td></tr>
+              <tr><td>DLF Ltd</td><td>INV-338</td><td>₹4.8L</td><td>15 Jun</td><td><span class="badge badge-warn">Due Soon</span></td></tr>
               <tr><td>Prestige</td><td>INV-335</td><td>₹3.2L</td><td>01 Jun</td><td><span class="badge badge-danger">Overdue</span></td></tr>
               <tr><td>Tata Housing</td><td>INV-332</td><td>₹2.1L</td><td>20 Jun</td><td><span class="badge badge-info">Pending</span></td></tr>
               <tr><td>Sobha</td><td>INV-328</td><td>₹1.3L</td><td>25 Jun</td><td><span class="badge badge-info">Pending</span></td></tr>
             </tbody>
-          </table>
+          </table></div>
         </div>
       </div>
     </div>
 
-    <!-- ATTENDANCE -->
+    <!-- ═══ ATTENDANCE ═══ -->
     <div class="view" id="view-attendance">
-      <div class="page-header"><div class="page-title">Employee Attendance</div><div class="page-sub">GPS-tagged IN/OUT, daily reports — replaces WhatsApp tracking</div></div>
+      <div class="page-header"><div class="page-title">Employee Attendance</div><div class="page-sub">GPS-tagged IN/OUT — replaces WhatsApp attendance tracking</div></div>
       <div class="metrics-row">
-        <div class="metric"><div class="metric-label">Present Today</div><div class="metric-value">34</div><div class="metric-delta up">of 40</div></div>
+        <div class="metric"><div class="metric-label">Present Today</div><div class="metric-value">34</div><div class="metric-delta">of 40 employees</div></div>
         <div class="metric"><div class="metric-label">Absent</div><div class="metric-value">2</div></div>
         <div class="metric"><div class="metric-label">Late Arrivals</div><div class="metric-value">4</div></div>
         <div class="metric"><div class="metric-label">On Leave</div><div class="metric-value">0</div></div>
       </div>
-      <div class="two-col">
+      <div class="col-2">
         <div class="card">
-          <div class="card-title">Mobile Punch — Employee Portal</div>
-          <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-lg);padding:20px;text-align:center;margin-bottom:12px">
-            <div style="font-size:13px;font-weight:500;margin-bottom:4px">Karthik R — EMP-042</div>
-            <div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:16px">Mon 09 Jun 2026 · 09:14 AM</div>
-            <div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:12px"><i class="ti ti-map-pin" style="font-size:14px;vertical-align:-2px" aria-hidden="true"></i> Anna Nagar, Chennai · 13.0878°N 80.2185°E</div>
-            <div style="display:flex;gap:12px;justify-content:center">
-              <div style="background:var(--color-background-success);color:var(--color-text-success);padding:12px 24px;border-radius:var(--border-radius-md);font-size:14px;font-weight:500;cursor:pointer"><i class="ti ti-login" aria-hidden="true"></i> IN</div>
-              <div style="background:var(--color-background-danger);color:var(--color-text-danger);padding:12px 24px;border-radius:var(--border-radius-md);font-size:14px;font-weight:500;cursor:pointer"><i class="ti ti-logout" aria-hidden="true"></i> OUT</div>
+          <div class="card-title">Mobile Punch Portal</div>
+          <div class="punch-card">
+            <div class="punch-user">Arjun K &nbsp;—&nbsp; EMP-042</div>
+            <div class="punch-date">Tue 09 Jun 2026 &nbsp;·&nbsp; 09:14 AM</div>
+            <div class="punch-loc"><i class="ti ti-map-pin" style="font-size:14px"></i>Anna Nagar, Chennai &nbsp;·&nbsp; 13.0878°N 80.2185°E</div>
+            <div class="punch-btns">
+              <button class="punch-in"><i class="ti ti-login"></i> IN</button>
+              <button class="punch-out"><i class="ti ti-logout"></i> OUT</button>
             </div>
           </div>
-          <div style="font-size:11px;color:var(--color-text-secondary);text-align:center">GPS location captured automatically on punch</div>
+          <div style="font-size:11px;color:var(--text-3);text-align:center">GPS location is captured automatically on every punch</div>
         </div>
         <div class="card">
           <div class="card-title">Today's Attendance Log</div>
-          <table>
+          <div class="tbl-wrap"><table>
             <thead><tr><th>Employee</th><th>IN Time</th><th>Location</th><th>Status</th></tr></thead>
             <tbody>
-              <tr><td>Karthik R</td><td>09:02</td><td>Anna Nagar</td><td><span class="badge badge-success">On Time</span></td></tr>
-              <tr><td>Murugan S</td><td>09:18</td><td>Velachery</td><td><span class="badge badge-warning">Late</span></td></tr>
+              <tr><td>Arjun K</td><td>09:02</td><td>Anna Nagar</td><td><span class="badge badge-success">On Time</span></td></tr>
+              <tr><td>Murugan S</td><td>09:18</td><td>Velachery</td><td><span class="badge badge-warn">Late</span></td></tr>
               <tr><td>Santhosh P</td><td>08:58</td><td>Thoraipakkam</td><td><span class="badge badge-success">On Time</span></td></tr>
               <tr><td>Vijay K</td><td>—</td><td>—</td><td><span class="badge badge-danger">Absent</span></td></tr>
               <tr><td>Priya M</td><td>09:05</td><td>Adyar</td><td><span class="badge badge-success">On Time</span></td></tr>
             </tbody>
-          </table>
+          </table></div>
         </div>
       </div>
       <div class="card">
-        <div class="card-title">Monthly Attendance — June 2026 (Karthik R)</div>
-        <div style="display:flex;gap:12px;margin-bottom:10px;font-size:11px">
-          <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:var(--color-background-success)"></span>Present</span>
-          <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:var(--color-background-danger)"></span>Absent</span>
-          <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:var(--color-background-warning)"></span>Late</span>
-          <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:var(--color-background-secondary);opacity:.5"></span>Weekend</span>
+        <div class="card-title">Monthly Attendance — June 2026 (Arjun K)</div>
+        <div class="cal-legend">
+          <div class="leg-item"><div class="leg-swatch" style="background:#BBF7D0;border:1px solid #86efac"></div>Present</div>
+          <div class="leg-item"><div class="leg-swatch" style="background:#FECACA;border:1px solid #fca5a5"></div>Absent</div>
+          <div class="leg-item"><div class="leg-swatch" style="background:#FDE68A;border:1px solid #fcd34d"></div>Late</div>
+          <div class="leg-item"><div class="leg-swatch" style="background:#F4F6FA;border:1px solid #E2E8F0"></div>Weekend</div>
         </div>
-        <div class="att-grid">
-          <div style="font-size:10px;color:var(--color-text-secondary);text-align:center;padding:4px">Mon</div>
-          <div style="font-size:10px;color:var(--color-text-secondary);text-align:center;padding:4px">Tue</div>
-          <div style="font-size:10px;color:var(--color-text-secondary);text-align:center;padding:4px">Wed</div>
-          <div style="font-size:10px;color:var(--color-text-secondary);text-align:center;padding:4px">Thu</div>
-          <div style="font-size:10px;color:var(--color-text-secondary);text-align:center;padding:4px">Fri</div>
-          <div style="font-size:10px;color:var(--color-text-secondary);text-align:center;padding:4px">Sat</div>
-          <div style="font-size:10px;color:var(--color-text-secondary);text-align:center;padding:4px">Sun</div>
-          <div class="att-day present">2</div><div class="att-day present">3</div><div class="att-day present">4</div><div class="att-day present">5</div><div class="att-day present">6</div><div class="att-day off">7</div><div class="att-day off">8</div>
-          <div class="att-day present">9</div><div class="att-day late">10</div><div class="att-day present">11</div><div class="att-day present">12</div><div class="att-day present">13</div><div class="att-day off">14</div><div class="att-day off">15</div>
-          <div class="att-day absent">16</div><div class="att-day present">17</div><div class="att-day present">18</div><div class="att-day late">19</div><div class="att-day present">20</div><div class="att-day off">21</div><div class="att-day off">22</div>
+        <div class="cal-grid">
+          <div class="cal-head">Mon</div><div class="cal-head">Tue</div><div class="cal-head">Wed</div>
+          <div class="cal-head">Thu</div><div class="cal-head">Fri</div><div class="cal-head">Sat</div><div class="cal-head">Sun</div>
+          <div class="cal-day present">2</div><div class="cal-day present">3</div><div class="cal-day present">4</div>
+          <div class="cal-day present">5</div><div class="cal-day present">6</div><div class="cal-day off">7</div><div class="cal-day off">8</div>
+          <div class="cal-day present">9</div><div class="cal-day late">10</div><div class="cal-day present">11</div>
+          <div class="cal-day present">12</div><div class="cal-day present">13</div><div class="cal-day off">14</div><div class="cal-day off">15</div>
+          <div class="cal-day absent">16</div><div class="cal-day present">17</div><div class="cal-day present">18</div>
+          <div class="cal-day late">19</div><div class="cal-day present">20</div><div class="cal-day off">21</div><div class="cal-day off">22</div>
         </div>
       </div>
     </div>
 
-    <!-- FIELD TRACKING -->
+    <!-- ═══ LOCATION ═══ -->
     <div class="view" id="view-location">
       <div class="page-header"><div class="page-title">Field Employee Tracking</div><div class="page-sub">GPS location, visit history and daily movement reports</div></div>
       <div class="metrics-row">
@@ -537,110 +806,112 @@ tr:hover td{background:var(--color-background-secondary)}
         <div class="metric"><div class="metric-label">Customer Visits</div><div class="metric-value">28</div><div class="metric-delta">today</div></div>
         <div class="metric"><div class="metric-label">Avg Distance</div><div class="metric-value">42 km</div><div class="metric-delta">per technician</div></div>
       </div>
-      <div class="two-col">
+      <div class="col-2">
         <div class="card">
           <div class="card-title">Live Field Status</div>
-          <table>
+          <div class="tbl-wrap"><table>
             <thead><tr><th>Technician</th><th>Last Location</th><th>Time</th><th>Activity</th></tr></thead>
             <tbody>
-              <tr><td>Karthik R</td><td>Anna Nagar</td><td>11:32</td><td><span class="badge badge-warning">At Site</span></td></tr>
+              <tr><td>Arjun K</td><td>Anna Nagar</td><td>11:32</td><td><span class="badge badge-warn">At Site</span></td></tr>
               <tr><td>Murugan S</td><td>Velachery</td><td>10:54</td><td><span class="badge badge-info">Travelling</span></td></tr>
               <tr><td>Santhosh P</td><td>Thoraipakkam</td><td>11:45</td><td><span class="badge badge-success">Job Done</span></td></tr>
-              <tr><td>Vijay K</td><td>Besant Nagar</td><td>11:10</td><td><span class="badge badge-warning">At Site</span></td></tr>
+              <tr><td>Vijay K</td><td>Besant Nagar</td><td>11:10</td><td><span class="badge badge-warn">At Site</span></td></tr>
             </tbody>
-          </table>
+          </table></div>
         </div>
         <div class="card">
           <div class="card-title">Map View — Chennai Field Teams</div>
-          <div class="map-placeholder">
-            <i class="ti ti-map-2" style="font-size:32px" aria-hidden="true"></i>
+          <div class="map-ph">
+            <i class="ti ti-map-2"></i>
             <div>Interactive map with live GPS pins</div>
             <div style="font-size:11px">Powered by Google Maps API in production</div>
           </div>
         </div>
       </div>
       <div class="card">
-        <div class="card-title">Karthik R — Today's Movement Log</div>
-        <table>
+        <div class="card-title">Arjun K — Today's Movement Log</div>
+        <div class="tbl-wrap"><table>
           <thead><tr><th>Time</th><th>Location</th><th>Coordinates</th><th>Activity</th></tr></thead>
           <tbody>
-            <tr><td>09:02</td><td>Home — Adyar</td><td>13.0063°N 80.2574°E</td><td>IN Punch</td></tr>
-            <tr><td>09:48</td><td>Sobha City, Anna Nagar</td><td>13.0878°N 80.2185°E</td><td>Service Visit</td></tr>
-            <tr><td>11:32</td><td>DLF Cyber Park, Sholinganallur</td><td>12.9006°N 80.2271°E</td><td>Installation</td></tr>
+            <tr><td>09:02</td><td>Home — Adyar</td><td>13.0063°N, 80.2574°E</td><td>IN Punch</td></tr>
+            <tr><td>09:48</td><td>Sobha City, Anna Nagar</td><td>13.0878°N, 80.2185°E</td><td>Service Visit</td></tr>
+            <tr><td>11:32</td><td>DLF Cyber Park, Sholinganallur</td><td>12.9006°N, 80.2271°E</td><td>Installation</td></tr>
           </tbody>
-        </table>
+        </table></div>
       </div>
     </div>
 
-    <!-- PETROL ALLOWANCE -->
+    <!-- ═══ PETROL ═══ -->
     <div class="view" id="view-petrol">
       <div class="page-header"><div class="page-title">Travel Expense & Petrol Allowance</div><div class="page-sub">Odometer-based daily reimbursement calculation</div></div>
       <div class="metrics-row">
         <div class="metric"><div class="metric-label">Total Distance (Jun)</div><div class="metric-value">4,820 km</div></div>
         <div class="metric"><div class="metric-label">Reimbursement (Jun)</div><div class="metric-value">₹28,920</div></div>
-        <div class="metric"><div class="metric-label">Rate Config</div><div class="metric-value">₹6/km</div></div>
+        <div class="metric"><div class="metric-label">Rate Configured</div><div class="metric-value">₹6 / km</div></div>
         <div class="metric"><div class="metric-label">Pending Approval</div><div class="metric-value">12</div></div>
       </div>
-      <div class="two-col">
+      <div class="col-2">
         <div class="card">
           <div class="card-title">Employee Daily Entry</div>
-          <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-lg);padding:16px">
-            <div style="font-size:13px;font-weight:500;margin-bottom:14px">Karthik R — 09 Jun 2026</div>
-            <div style="margin-bottom:12px">
-              <div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:4px">Start Odometer (KM)</div>
-              <div style="background:var(--color-background-primary);border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:8px 12px;font-size:15px;font-weight:500">25,000</div>
+          <div class="odo-box">
+            <div class="odo-user">Arjun K &nbsp;—&nbsp; 09 Jun 2026</div>
+            <div class="odo-field">
+              <label>Start Odometer (km)</label>
+              <input type="number" id="odoStart" value="25000" oninput="calcOdo()"/>
             </div>
-            <div style="margin-bottom:12px">
-              <div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:4px">End Odometer (KM)</div>
-              <div style="background:var(--color-background-primary);border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:8px 12px;font-size:15px;font-weight:500">25,120</div>
+            <div class="odo-field">
+              <label>End Odometer (km)</label>
+              <input type="number" id="odoEnd" value="25120" oninput="calcOdo()"/>
             </div>
-            <div style="border-top:0.5px solid var(--color-border-tertiary);padding-top:12px">
-              <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:13px;color:var(--color-text-secondary)">Distance Travelled</span><span style="font-weight:500">120 km</span></div>
-              <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:13px;color:var(--color-text-secondary)">Rate per KM</span><span style="font-weight:500">₹6.00</span></div>
-              <div style="display:flex;justify-content:space-between"><span style="font-size:13px;font-weight:500">Petrol Allowance</span><span style="font-size:16px;font-weight:500;color:var(--color-text-success)">₹720</span></div>
+            <div class="odo-result">
+              <div class="odo-result-row"><span style="color:var(--text-2)">Distance Travelled</span><span id="odoDist" style="font-weight:600">120 km</span></div>
+              <div class="odo-result-row"><span style="color:var(--text-2)">Rate per km</span><span style="font-weight:600">₹6.00</span></div>
+              <div class="odo-result-row total"><span style="font-weight:600">Petrol Allowance</span><span class="odo-result-val" id="odoAmt">₹720</span></div>
             </div>
           </div>
         </div>
         <div class="card">
           <div class="card-title">Monthly Report — June 2026</div>
-          <table>
-            <thead><tr><th>Employee</th><th>Total KM</th><th>Allowance</th><th>Status</th></tr></thead>
+          <div class="tbl-wrap"><table>
+            <thead><tr><th>Employee</th><th>Total km</th><th>Allowance</th><th>Status</th></tr></thead>
             <tbody>
-              <tr><td>Karthik R</td><td>842 km</td><td>₹5,052</td><td><span class="badge badge-success">Approved</span></td></tr>
-              <tr><td>Murugan S</td><td>710 km</td><td>₹4,260</td><td><span class="badge badge-warning">Pending</span></td></tr>
-              <tr><td>Santhosh P</td><td>630 km</td><td>₹3,780</td><td><span class="badge badge-warning">Pending</span></td></tr>
+              <tr><td>Arjun K</td><td>842 km</td><td>₹5,052</td><td><span class="badge badge-success">Approved</span></td></tr>
+              <tr><td>Murugan S</td><td>710 km</td><td>₹4,260</td><td><span class="badge badge-warn">Pending</span></td></tr>
+              <tr><td>Santhosh P</td><td>630 km</td><td>₹3,780</td><td><span class="badge badge-warn">Pending</span></td></tr>
               <tr><td>Vijay K</td><td>594 km</td><td>₹3,564</td><td><span class="badge badge-success">Approved</span></td></tr>
               <tr><td>Priya M</td><td>480 km</td><td>₹2,880</td><td><span class="badge badge-success">Approved</span></td></tr>
             </tbody>
-          </table>
+          </table></div>
         </div>
       </div>
     </div>
 
-    <!-- REPORTS -->
+    <!-- ═══ REPORTS ═══ -->
     <div class="view" id="view-reports">
       <div class="page-header"><div class="page-title">Reports</div><div class="page-sub">Download Excel and PDF reports across all modules</div></div>
-      <div class="three-col">
-        <div class="card" style="cursor:pointer"><div style="display:flex;align-items:center;gap:10px;margin-bottom:8px"><i class="ti ti-users" style="font-size:20px;color:#185FA5" aria-hidden="true"></i><div class="card-title" style="margin:0">Attendance Report</div></div><div style="font-size:12px;color:var(--color-text-secondary)">Daily / Monthly / Employee-wise</div><div style="margin-top:10px;display:flex;gap:6px"><span class="badge badge-info">Excel</span><span class="badge badge-danger">PDF</span></div></div>
-        <div class="card" style="cursor:pointer"><div style="display:flex;align-items:center;gap:10px;margin-bottom:8px"><i class="ti ti-fuel" style="font-size:20px;color:#185FA5" aria-hidden="true"></i><div class="card-title" style="margin:0">Travel Allowance</div></div><div style="font-size:12px;color:var(--color-text-secondary)">Odometer-based reimbursement</div><div style="margin-top:10px;display:flex;gap:6px"><span class="badge badge-info">Excel</span><span class="badge badge-danger">PDF</span></div></div>
-        <div class="card" style="cursor:pointer"><div style="display:flex;align-items:center;gap:10px;margin-bottom:8px"><i class="ti ti-receipt" style="font-size:20px;color:#185FA5" aria-hidden="true"></i><div class="card-title" style="margin:0">Sales & Invoices</div></div><div style="font-size:12px;color:var(--color-text-secondary)">Quotations, orders, invoices</div><div style="margin-top:10px;display:flex;gap:6px"><span class="badge badge-info">Excel</span><span class="badge badge-danger">PDF</span></div></div>
-        <div class="card" style="cursor:pointer"><div style="display:flex;align-items:center;gap:10px;margin-bottom:8px"><i class="ti ti-packages" style="font-size:20px;color:#185FA5" aria-hidden="true"></i><div class="card-title" style="margin:0">Inventory Status</div></div><div style="font-size:12px;color:var(--color-text-secondary)">Stock levels, movements</div><div style="margin-top:10px;display:flex;gap:6px"><span class="badge badge-info">Excel</span><span class="badge badge-danger">PDF</span></div></div>
-        <div class="card" style="cursor:pointer"><div style="display:flex;align-items:center;gap:10px;margin-bottom:8px"><i class="ti ti-coins" style="font-size:20px;color:#185FA5" aria-hidden="true"></i><div class="card-title" style="margin:0">Financial Reports</div></div><div style="font-size:12px;color:var(--color-text-secondary)">P&L, Balance Sheet, Cash Flow</div><div style="margin-top:10px;display:flex;gap:6px"><span class="badge badge-info">Excel</span><span class="badge badge-danger">PDF</span></div></div>
-        <div class="card" style="cursor:pointer"><div style="display:flex;align-items:center;gap:10px;margin-bottom:8px"><i class="ti ti-tool" style="font-size:20px;color:#185FA5" aria-hidden="true"></i><div class="card-title" style="margin:0">AMC & Service</div></div><div style="font-size:12px;color:var(--color-text-secondary)">Contracts, renewals, history</div><div style="margin-top:10px;display:flex;gap:6px"><span class="badge badge-info">Excel</span><span class="badge badge-danger">PDF</span></div></div>
+      <div class="report-grid">
+        <div class="report-card"><i class="ti ti-users"></i><div class="report-card-title">Attendance Report</div><div class="report-card-sub">Daily / Monthly / Employee-wise</div><div class="report-btns"><span class="badge badge-info">Excel</span><span class="badge badge-danger">PDF</span></div></div>
+        <div class="report-card"><i class="ti ti-fuel"></i><div class="report-card-title">Travel Allowance</div><div class="report-card-sub">Odometer-based reimbursement</div><div class="report-btns"><span class="badge badge-info">Excel</span><span class="badge badge-danger">PDF</span></div></div>
+        <div class="report-card"><i class="ti ti-receipt"></i><div class="report-card-title">Sales & Invoices</div><div class="report-card-sub">Quotations, orders, invoices</div><div class="report-btns"><span class="badge badge-info">Excel</span><span class="badge badge-danger">PDF</span></div></div>
+        <div class="report-card"><i class="ti ti-packages"></i><div class="report-card-title">Inventory Status</div><div class="report-card-sub">Stock levels and movements</div><div class="report-btns"><span class="badge badge-info">Excel</span><span class="badge badge-danger">PDF</span></div></div>
+        <div class="report-card"><i class="ti ti-coins"></i><div class="report-card-title">Financial Reports</div><div class="report-card-sub">P&L, Balance Sheet, Cash Flow</div><div class="report-btns"><span class="badge badge-info">Excel</span><span class="badge badge-danger">PDF</span></div></div>
+        <div class="report-card"><i class="ti ti-tool"></i><div class="report-card-title">AMC & Service</div><div class="report-card-sub">Contracts, renewals, history</div><div class="report-btns"><span class="badge badge-info">Excel</span><span class="badge badge-danger">PDF</span></div></div>
+        <div class="report-card"><i class="ti ti-building-skyscraper"></i><div class="report-card-title">Project Status</div><div class="report-card-sub">Stage-wise project tracker</div><div class="report-btns"><span class="badge badge-info">Excel</span><span class="badge badge-danger">PDF</span></div></div>
+        <div class="report-card"><i class="ti ti-chart-pie"></i><div class="report-card-title">Project Profitability</div><div class="report-card-sub">Cost vs revenue per project</div><div class="report-btns"><span class="badge badge-info">Excel</span><span class="badge badge-danger">PDF</span></div></div>
       </div>
     </div>
 
-    <!-- SETTINGS -->
+    <!-- ═══ SETTINGS ═══ -->
     <div class="view" id="view-settings">
       <div class="page-header"><div class="page-title">Settings & Role Management</div><div class="page-sub">User accounts, permissions and system configuration</div></div>
-      <div class="two-col">
+      <div class="col-2">
         <div class="card">
           <div class="card-title">User Roles & Permissions</div>
-          <table>
+          <div class="tbl-wrap"><table>
             <thead><tr><th>Role</th><th>Users</th><th>Access Level</th></tr></thead>
             <tbody>
               <tr><td>Super Admin</td><td>1</td><td><span class="badge badge-danger">Full Access</span></td></tr>
-              <tr><td>Accounts Manager</td><td>2</td><td><span class="badge badge-warning">Finance + Reports</span></td></tr>
+              <tr><td>Accounts Manager</td><td>2</td><td><span class="badge badge-warn">Finance + Reports</span></td></tr>
               <tr><td>Project Manager</td><td>3</td><td><span class="badge badge-info">Projects + Inventory</span></td></tr>
               <tr><td>Service Manager</td><td>2</td><td><span class="badge badge-info">Service + AMC</span></td></tr>
               <tr><td>Inventory Manager</td><td>1</td><td><span class="badge badge-info">Inventory + Procurement</span></td></tr>
@@ -648,11 +919,11 @@ tr:hover td{background:var(--color-background-secondary)}
               <tr><td>Technician</td><td>18</td><td><span class="badge badge-gray">Mobile Portal</span></td></tr>
               <tr><td>Sales Executive</td><td>4</td><td><span class="badge badge-gray">Sales + CRM</span></td></tr>
             </tbody>
-          </table>
+          </table></div>
         </div>
         <div class="card">
           <div class="card-title">System Configuration</div>
-          <div class="fin-row"><div class="fin-label">Petrol Rate / KM</div><div class="fin-val">₹6.00</div></div>
+          <div class="fin-row"><div class="fin-label">Petrol Rate / km</div><div class="fin-val">₹6.00</div></div>
           <div class="fin-row"><div class="fin-label">GST Rate (Installation)</div><div class="fin-val">18%</div></div>
           <div class="fin-row"><div class="fin-label">GST Rate (AMC)</div><div class="fin-val">18%</div></div>
           <div class="fin-row"><div class="fin-label">Office Start Time</div><div class="fin-val">09:00 AM</div></div>
@@ -664,64 +935,78 @@ tr:hover td{background:var(--color-background-secondary)}
       </div>
     </div>
 
-  </div>
+  </main>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
-function switchView(name) {
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  document.getElementById('view-' + name).classList.add('active');
-  document.querySelectorAll('.nav-item').forEach(n => {
-    if (n.getAttribute('onclick') && n.getAttribute('onclick').includes("'" + name + "'")) n.classList.add('active');
+  function go(name) {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('view-' + name).classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(n => {
+      if (n.getAttribute('onclick') === "go('" + name + "')") n.classList.add('active');
+    });
+  }
+
+  function calcOdo() {
+    const s = parseFloat(document.getElementById('odoStart').value) || 0;
+    const e = parseFloat(document.getElementById('odoEnd').value) || 0;
+    const dist = Math.max(0, Math.round(e - s));
+    const amt  = dist * 6;
+    document.getElementById('odoDist').textContent = dist + ' km';
+    document.getElementById('odoAmt').textContent  = '₹' + amt.toLocaleString('en-IN');
+  }
+
+  window.addEventListener('load', function() {
+    const gridColor = 'rgba(0,0,0,0.06)';
+    const tickColor = '#94A3B8';
+
+    new Chart(document.getElementById('revChart'), {
+      type: 'bar',
+      data: {
+        labels: ['Jan','Feb','Mar','Apr','May','Jun'],
+        datasets: [{
+          label: 'Revenue (₹L)',
+          data: [28,31,26,34,34,38],
+          backgroundColor: '#1E40AF',
+          borderRadius: 5,
+          borderSkipped: false
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { grid: { color: gridColor }, ticks: { color: tickColor, font: { size: 11, family: 'Inter' } } },
+          y: { grid: { color: gridColor }, ticks: { color: tickColor, font: { size: 11, family: 'Inter' }, callback: v => '₹' + v + 'L' } }
+        }
+      }
+    });
+
+    new Chart(document.getElementById('custChart'), {
+      type: 'bar',
+      data: {
+        labels: ['DLF','Tata','Prestige','Godrej','Sobha'],
+        datasets: [{
+          label: 'Revenue (₹L)',
+          data: [71,45,34,22,18],
+          backgroundColor: ['#1E40AF','#166534','#1E40AF','#166534','#1E40AF'],
+          borderRadius: 5,
+          borderSkipped: false
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { grid: { color: gridColor }, ticks: { color: tickColor, font: { size: 11, family: 'Inter' }, callback: v => '₹' + v + 'L' } },
+          y: { grid: { display: false }, ticks: { color: tickColor, font: { size: 11, family: 'Inter' } } }
+        }
+      }
+    });
   });
-}
-
-const isDark = matchMedia('(prefers-color-scheme: dark)').matches;
-const gridColor = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)';
-const tickColor = isDark ? '#888' : '#999';
-
-new Chart(document.getElementById('revChart'), {
-  type: 'bar',
-  data: {
-    labels: ['Jan','Feb','Mar','Apr','May','Jun'],
-    datasets: [{
-      label: 'Revenue (₹L)',
-      data: [28,31,26,34,34,38],
-      backgroundColor: '#185FA5',
-      borderRadius: 4
-    }]
-  },
-  options: {
-    responsive: true, maintainAspectRatio: false,
-    plugins: { legend: { display: false } },
-    scales: {
-      x: { grid: { color: gridColor }, ticks: { color: tickColor, font: { size: 11 } } },
-      y: { grid: { color: gridColor }, ticks: { color: tickColor, font: { size: 11 }, callback: v => '₹' + v + 'L' } }
-    }
-  }
-});
-
-new Chart(document.getElementById('custChart'), {
-  type: 'bar',
-  data: {
-    labels: ['DLF','Tata','Prestige','Godrej','Sobha'],
-    datasets: [{
-      label: '₹L',
-      data: [71,45,34,22,18],
-      backgroundColor: ['#185FA5','#0F6E56','#185FA5','#0F6E56','#185FA5'],
-      borderRadius: 4
-    }]
-  },
-  options: {
-    indexAxis: 'y',
-    responsive: true, maintainAspectRatio: false,
-    plugins: { legend: { display: false } },
-    scales: {
-      x: { grid: { color: gridColor }, ticks: { color: tickColor, font: { size: 11 }, callback: v => '₹' + v + 'L' } },
-      y: { grid: { display: false }, ticks: { color: tickColor, font: { size: 11 } } }
-    }
-  }
-});
 </script>
+</body>
+</html>
+
